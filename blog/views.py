@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect, get_object_or_404
-from blog.models import BlogPost
+from blog.models import BlogPost, Comment
 from django.http import HttpResponse
 from blog.forms import CreateBlogPostForm, UpdateBlogPostForm
 from account.models import Account
@@ -28,13 +28,39 @@ def create_blog_view(request):
 
 def detail_blog_view(request,slug):
 
-	context = {}
+	if request.method=="POST":
+		comment=request.POST.get('comment')
+		comment_obj = Comment()
+		comment_obj.comment_text = comment
+		#print(Account.objects.filter(username=request.user).first().username)
+		comment_obj.user_id = Account.objects.filter(username=request.user).first()
+		
+		blog_post = get_object_or_404(BlogPost, slug=slug)
+		print(blog_post)
+		comment_obj.blog_id = blog_post
+		
+		comment_obj.save()
 
+	# 	comments=Comment.objects.filter(blog_id=blog_post)
+
+	# 	return render(request,'blog/detail_blog.html',{'comments':comments})
+
+
+	# else:
+
+	context = {}
+	context['slug']=slug
 	blog_post = get_object_or_404(BlogPost, slug=slug)
 	context['blog_post'] = blog_post
 
+	comments=Comment.objects.filter(blog_id=blog_post)
+	context['comments'] = comments
+	context['likes']=blog_post.like_count
 	return render(request,'blog/detail_blog.html',context)
 
+def blog_like(request):
+
+	print(request)
 
 def edit_blog_view(request,slug):
 

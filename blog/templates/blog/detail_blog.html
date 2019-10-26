@@ -2,9 +2,6 @@
 
 {% block content %}
 
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 <style type="text/css">
 	.card {
@@ -99,6 +96,16 @@ button.learnmore{
 			<p>{{ comment.comment_text }}</p>
 			{% endfor %}
 		</div>-->
+{% for category in category_list %}
+<div class="w3-row w3-padding-8">
+
+<div class="w3-col 8 w3-padding-xsmall">
+	<h4>{{ category.category }}</h4>
+	<br>
+</div>
+</div>
+{% endfor %}
+   
 {% for comment in comments %}
 	 <div class="w3-row w3-padding-8">
 	
@@ -119,11 +126,13 @@ button.learnmore{
 		var like=document.getElementById('likes');
 		like.innerHTML=parseInt(like.innerHTML)+1;
 		const no_likes=like.innerHTML;
+		console.log(no_likes)
 		$('.like').hide();
 		$('.dislike').show();
+		console.log('/blog/likes/{{ slug }}');
 		//console.log(slug)
 		$.ajax({
-			type:"POST",
+			type:"post",
 			url:"/blog/likes/{{ slug }}",
 			data:{'likes': no_likes},
 			success: function(data){

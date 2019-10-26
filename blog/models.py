@@ -22,6 +22,7 @@ class BlogPost(models.Model):
 	author			= models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 	like_count      = models.IntegerField(default=0)
 	slug			= models.SlugField(blank=True, unique=True)
+	category		= models.TextField(max_length=500, null=True, blank=True)
 	
 	def __str__(self):
 		return self.title
@@ -46,6 +47,14 @@ class Likes(models.Model):
 
 	blog_id=models.ForeignKey(BlogPost,on_delete=models.CASCADE)
 	user_id=models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+class Categories(models.Model):
+
+	blog_id=models.ForeignKey(BlogPost,on_delete=models.CASCADE)
+	category = models.CharField(max_length=25, null=False, blank=False)
+	
+	
+
 	
 
 

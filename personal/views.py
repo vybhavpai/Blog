@@ -6,7 +6,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 # Create your views here.
 
-BLOG_POSTS_PER_PAGE = 1
+BLOG_POSTS_PER_PAGE = 4
 def home_screen_view(request):
 
 	context = {}

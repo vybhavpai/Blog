@@ -43,12 +43,16 @@
 <form class="form-signin" method="post"> {% csrf_token %}
   <!-- <img class="mb-4" src="{{ site.baseurl }}/docs/{{ site.docs_version }}/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72"> if in case we want to add images
    -->
-   <h1 class="h3 mb-3 font-weight-normal">Register</h1>
-	<input type="email" name = "email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+	<h1 class="h3 mb-3 font-weight-normal">Register</h1>
+	<input type="text" name = "first_name" id="inputFirstName" class="form-control" placeholder="First Name" required autofocus>
+	<input type="text" name = "last_name" id="inputLastName" class="form-control" placeholder="Last Name" required autofocus>
 	<input type="text" name = "username" id="inputUsername" class="form-control" placeholder="Username" required>
-	
+	<input type="email" name = "email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+	<input type="text" name = "phone" id="inputPhone" class="form-control" placeholder="Phone" required autofocus>
+	<input type="text" name = "address" id="inputAddress" class="form-control" placeholder="Address" required>
+
 	<input type="password" name = "password1" id="inputPassword1" class="form-control" placeholder="Password" required>
-	
+
 	<input type="password" name = "password2" id="inputPassword2" class="form-control" placeholder="Confirm Password" required>
 	
 

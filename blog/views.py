@@ -1,33 +1,42 @@
 from django.shortcuts import render,redirect, get_object_or_404
-from blog.models import BlogPost, Comment, Categories
-from django.http import HttpResponse
+from blog.models import BlogPost, Comment,Likes,Extra_Image
+from django.http import HttpResponse,JsonResponse
 from blog.forms import CreateBlogPostForm, UpdateBlogPostForm
 from account.models import Account
 from django.db.models import Q
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
+
+class Content:
+
+	def __init__(self,content,img=None):
+		self.content=content
+		self.img=img
 
 def create_blog_view(request):
 
 	context = {}
 
 	user = request.user
+	user_id=Account.objects.filter(username=request.user).first()
 	if not user.is_authenticated:
 		return redirect('must_authenticate')
 
 	form = CreateBlogPostForm(request.POST or None, request.FILES or None)
+	#print(request.POST.get('title'))
+		
+	
 	if form.is_valid():
 		obj = form.save(commit=False)
 		author = Account.objects.filter(email=user.email).first()
 		obj.author = author
 		obj.save()
-		category_list = form.cleaned_data['category'].split(':')
-		for category in category_list:
-			cat_obj = Categories()
-			cat_obj.blog_id = BlogPost.objects.get(title=form.cleaned_data['title'])
-			cat_obj.category = category
-			cat_obj.save()
-
 		form = CreateBlogPostForm()
+		for f in request.FILES.getlist('other_image'):
+			img=Extra_Image()
+			img.blog_id=obj
+			img.image=f
+			img.save()
 
 	context['form'] = form
 
@@ -43,34 +52,70 @@ def detail_blog_view(request,slug):
 		comment_obj.user_id = Account.objects.filter(username=request.user).first()
 		
 		blog_post = get_object_or_404(BlogPost, slug=slug)
-		print(blog_post)
+
 		comment_obj.blog_id = blog_post
 		
 		comment_obj.save()
-
-	# 	comments=Comment.objects.filter(blog_id=blog_post)
-
-	# 	return render(request,'blog/detail_blog.html',{'comments':comments})
-
-
-	# else:
 
 	context = {}
 	
 	context['slug']=slug
 	blog_post = get_object_or_404(BlogPost, slug=slug)
-	context['blog_post'] = blog_post
-	category_list = Categories.objects.filter(blog_id = blog_post)
-	context['category_list'] = category_list
+	img=Extra_Image.objects.filter(blog_id=blog_post)
+	context['image_list']=img
 	
+	try:
+		like_obj=Likes.objects.get(blog_id=blog_post,user_id=Account.objects.filter(username=request.user).first())
+		context['like_status']=True
+	except:
+		context['like_status']=False
+	context['blog_post'] = blog_post
+	print(blog_post.body)
+	content=blog_post.body.split('<img>')
+	content_img=[]
+	for i in range(len(img)):
+		f=Content(content[i],img[i])
+		content_img.append(f)
+	f=Content(content[i])
+	content_img.append(f)
+
+	context['content_img']=content_img
 	comments=Comment.objects.filter(blog_id=blog_post)
 	context['comments'] = comments
 	context['likes']=blog_post.like_count
+	context['content']=content
 	return render(request,'blog/detail_blog.html',context)
 
-def blog_like(request):
+@csrf_exempt
+def blog_like(request,slug):
+	if request.method=="POST":
+		blog_post = get_object_or_404(BlogPost, slug=slug)
+		blog_post.like_count+=1
+		blog_post.save()
+		user_id=Account.objects.filter(username=request.user).first()
+		print(blog_post,user_id)
+		like=Likes()
+		like.blog_id=blog_post
+		like.user_id=user_id
+		like.save()
+		#print(request.POST)
 
-	print(request)
+	
+	#print(request.data)
+	
+	return JsonResponse({'name':'Shashank'})
+
+@csrf_exempt
+def blog_dislike(request,slug):
+	if request.method=="POST":
+		blog_post = get_object_or_404(BlogPost, slug=slug)
+		blog_post.like_count-=1
+		blog_post.save()
+		user_id=Account.objects.filter(username=request.user).first()
+		like=Likes.objects.get(blog_id=blog_post,user_id=user_id)
+		like.delete()
+
+	return JsonResponse({'name':'disliked'})
 
 def edit_blog_view(request,slug):
 

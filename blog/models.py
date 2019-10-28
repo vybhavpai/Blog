@@ -13,6 +13,12 @@ def upload_location(instance, filename, **kwargs):
 		)
 	return file_path
 
+def upload_images_location(instance, filename, **kwargs):
+	file_path = 'blog/{author_id}/{title}-{filename}'.format(
+			author_id=str(instance.blog_id.author.id), title=str(instance.blog_id.title), filename=filename
+		)
+	return file_path
+
 class BlogPost(models.Model):
 	title			= models.CharField(max_length=50, null=False, blank=False)
 	body			= models.TextField(max_length=5000, null=False, blank=False)
@@ -22,7 +28,6 @@ class BlogPost(models.Model):
 	author			= models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 	like_count      = models.IntegerField(default=0)
 	slug			= models.SlugField(blank=True, unique=True)
-	category		= models.TextField(max_length=500, null=True, blank=True)
 	
 	def __str__(self):
 		return self.title
@@ -48,13 +53,11 @@ class Likes(models.Model):
 	blog_id=models.ForeignKey(BlogPost,on_delete=models.CASCADE)
 	user_id=models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
-class Categories(models.Model):
+class Extra_Image(models.Model):
+	blog_id = models.ForeignKey(BlogPost,on_delete=models.CASCADE)
+	image = models.ImageField(upload_to=upload_images_location, null=False, blank=False)
 
-	blog_id=models.ForeignKey(BlogPost,on_delete=models.CASCADE)
-	category = models.CharField(max_length=25, null=False, blank=False)
 	
-	
-
 	
 
 

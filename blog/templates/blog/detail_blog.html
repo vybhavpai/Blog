@@ -78,29 +78,29 @@ button.learnmore{
 				{% endif %}
 			</div>
 			<p id="likes">{{ likes }}</p>
-			{% if not like_status %}
-				<button class="like" onclick="like();">
-				<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
-				</button>
+			{% if valid_user %}
+				{% if not like_status %}
+					<button class="like" onclick="like();">
+					<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+					</button>
 
-				<button class="dislike" onclick="dislike();" style="visibility: hidden">
-				<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
-				</button>
+					<button class="dislike" onclick="dislike();" style="visibility: hidden">
+					<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
+					</button>
+					
 				
-			
 
-			{% else %}
-				<button class="dislike" onclick="dislike();">
-				<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
-				</button>
-				
-				<button class="like" onclick="like();" style="visibility: hidden">
-				<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
-				</button>
+				{% else %}
+					<button class="dislike" onclick="dislike();">
+					<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
+					</button>
+					
+					<button class="like" onclick="like();" style="visibility: hidden">
+					<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+					</button>
 
+				{% endif %}
 			{% endif %}
-
-			
 
 
 			<div class="card-footer text-muted">
@@ -113,27 +113,25 @@ button.learnmore{
 
 	</div>
 	<input id="slug" type="hidden" value={{ slug }} readonly>
-	<form method="post">
+
+	{% if valid_user %}
+		<form method="post">
 			{% csrf_token %}
 			<input type='text' placeholder="Comments" name="comment">
 			<input type="submit" value="Comment">
 		</form>
 		<br><br>
-		<!--<div id="comments" class="m-auto">
-			{% for comment in comments %}
-			<p>{{ comment.user_id.username }}</p>
-			<p>{{ comment.comment_text }}</p>
-			{% endfor %}
-		</div>-->
-{% for comment in comments %}
-	 <div class="w3-row w3-padding-8">
-	
-    <div class="w3-col 8 w3-padding-xsmall">
-      <h4>{{ comment.user_id.username }}</h4>
-      <p class="w3-text-grey">{{ comment.comment_text }}</p><br>
-    </div>
-	</div>
-{% endfor %}
+	{% endif %}
+		
+	{% for comment in comments %}
+		 <div class="w3-row w3-padding-8">
+		
+	    <div class="w3-col 8 w3-padding-xsmall">
+	      <h4>{{ comment.user_id.username }}</h4>
+	      <p class="w3-text-grey">{{ comment.comment_text }}</p><br>
+	    </div>
+		</div>
+	{% endfor %}
 
 	
 </div>

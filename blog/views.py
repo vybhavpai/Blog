@@ -64,6 +64,13 @@ def detail_blog_view(request,slug):
 	img=Extra_Image.objects.filter(blog_id=blog_post)
 	context['image_list']=img
 	
+	user = request.user
+	if not user.is_authenticated:
+		context['valid_user'] = False
+	else:
+		context['valid_user'] = True
+	
+
 	try:
 		like_obj=Likes.objects.get(blog_id=blog_post,user_id=Account.objects.filter(username=request.user).first())
 		context['like_status']=True

@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<style type="text/css">
+	.card {
+		max-width: 700px;
+	}
+	.container {
+		padding: 20px;
+	}
+	button.like{
+	width: 30px;
+	height: 30px;
+	margin: 0 auto;
+	line-heigth: 50px;
+	border-radius: 50%;
+	color: rgba(0,150,136 ,1);
+	background-color:rgba(38,166,154 ,0.3);
+	border-color: rgba(0,150,136 ,1);
+	border-width: 1px;
+	font-size: 15px;
+}
+
+button.dislike{
+	width: 30px;
+	height: 30px;
+	margin: 0 auto;
+	line-heigth: 50px;
+	border-radius: 50%;
+	color: rgba(255,82,82 ,1);
+	background-color: rgba(255,138,128 ,0.3);
+	border-color: rgba(255,82,82 ,1);
+	border-width: 1px;
+	font-size: 15px;
+}
+
+button.learnmore{
+	width: 100%;
+	padding: 10px;
+	border: none;
+	background: rgba(0,151,167 ,1);
+	border-radius: 5px;
+	text-transform: uppercase;
+	font-size: 16px;
+	color: #fff;
+	letter-spacing: 1px;
+}
+
+.box{
+	width:100px;
+	height:100px;
+}
+
+.blue{
+	background:#00f;
+}
+
+</style>
+
+
+
+<div class="container">
+	<div class="row">
+
+
+		<!-- Blog post -->
+		<div class="card m-auto">
+			<img class="card-img-top" src="{{blog_post.image.url}}">
+			<div class="card-body my-2">
+				<h2 class="card-title">{{blog_post.title}} </h2>
+				{% for category in category_list %}
+					<h7 class="box blue">{{ category.category }}</h7>
+				{% endfor %}
+				<br>
+				<br>	
+				{% for i in content_img %}
+					<p class="card-text">{{i.content}}</p> <!-- safe means the render the html inside the body of the content-->
+					<img class="card-img-top" id="other_image" src='{{ i.img.image.url }}'>
+				{% endfor %}
+				<p class="card-text">{{last_text_body}}</p>
+				{% if blog_post.author == request.user %}
+			  		<a href="{% url 'blog:edit' blog_post.slug %}" class="btn btn-primary">Update</a>
+				{% endif %}
+			</div>
+			<p id="likes">{{ likes }}</p>
+			{% if valid_user %}
+				{% if not like_status %}
+					<button class="like" onclick="like();">
+					<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+					</button>
+
+					<button class="dislike" onclick="dislike();" style="visibility: hidden">
+					<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
+					</button>
+					
+				
+
+				{% else %}
+					<button class="dislike" onclick="dislike();">
+					<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
+					</button>
+					
+					<button class="like" onclick="like();" style="visibility: hidden">
+					<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+					</button>
+
+				{% endif %}
+			{% endif %}
+
+			
+
+
+
+			<div class="card-footer text-muted">
+				Updated on {{blog_post.date_updated}} by {{blog_post.author}}
+				
+			</div>
+		</div>
+		<!-- EndBlog post -->
+		
+
+	</div>
+	<input id="slug" type="hidden" value={{ slug }} readonly>
+
+	{% if valid_user %}
+		<form method="post">
+			{% csrf_token %}
+			<input type='text' placeholder="Comments" name="comment">
+			<input type="submit" value="Comment">
+		</form>
+		<br><br>
+	{% endif %}
+		
+	{% for comment in comments %}
+		 <div class="w3-row w3-padding-8">
+		
+	    <div class="w3-col 8 w3-padding-xsmall">
+	      <h4>{{ comment.user_id.username }}</h4>
+	      <p class="w3-text-grey">{{ comment.comment_text }}</p><br>
+	    </div>
+		</div>
+	{% endfor %}
+
+	
+</div>
+
+<script>
+	function like(){
+		console.log("Hi");
+		var $slug=$('#slug');
+		console.log($slug.val());
+		var like=document.getElementById('likes');
+		const no_likes=like.innerHTML;
+		$('.like').css('visibility','hidden');
+		$('.dislike').css("visibility","visible");
+		//console.log(slug)
+		/*$.ajax({
+			method:"POST",
+			url:"/blog/likes/{{ slug }}",
+			data:{'likes': no_likes},
+			success: function(data){
+				console.log('');
+			},
+			error: (error)=>{
+				console.log(error);
+				console.log("Request not send");
+			}
+		});*/
+		var formdata=new FormData();
+		formdata.append('liked','True')
+		fetch('http://localhost:8000/blog/likes/{{ slug }}/',{
+			method: 'post',
+			headers: {
+      			'Accept': 'application/json',
+      			'Content-Type': 'application/json'
+    		},
+			body: formdata
+		})
+		.then((response)=>{
+			return response.json()
+		})
+		.then((data)=>{
+			console.log('POst request created',data);
+			like.innerHTML=parseInt(like.innerHTML)+1;
+		})
+	}
+	function dislike(){
+		var like=document.getElementById('likes');
+		$('.like').css('visibility','visible');
+		$('.dislike').css('visibility','hidden');
+		var $slug=$('#slug');
+		const no_likes=like.innerHTML;
+
+		fetch('http://localhost:8000/blog/dislikes/{{ slug }}/',{
+			method: 'post',
+			body: JSON.stringify({'likes':'disliked'})
+		})
+		.then((response)=>{
+			return response.json()
+		})
+		.then((data)=>{
+			console.log('POst request created',data);
+			like.innerHTML=parseInt(like.innerHTML)-1;
+		})
+	}
+
+
+</script>
+<script type="text/javascript">
+	
+</script>
+{% endblock content %}
+

@@ -7,49 +7,23 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 <style type="text/css">
+	#comments_style{
+		margin-left: 115px;
+	}
+	#comment_box{
+		margin-left: 115px;
+	}
 	.card {
 		max-width: 700px;
 	}
 	.container {
 		padding: 20px;
 	}
-	button.like{
-	width: 30px;
-	height: 30px;
-	margin: 0 auto;
-	line-heigth: 50px;
-	border-radius: 50%;
-	color: rgba(0,150,136 ,1);
-	background-color:rgba(38,166,154 ,0.3);
-	border-color: rgba(0,150,136 ,1);
-	border-width: 1px;
-	font-size: 15px;
-}
+	#display_button{
+		display: inline-block;
+		margin-left: 20px;
+	}
 
-button.dislike{
-	width: 30px;
-	height: 30px;
-	margin: 0 auto;
-	line-heigth: 50px;
-	border-radius: 50%;
-	color: rgba(255,82,82 ,1);
-	background-color: rgba(255,138,128 ,0.3);
-	border-color: rgba(255,82,82 ,1);
-	border-width: 1px;
-	font-size: 15px;
-}
-
-button.learnmore{
-	width: 100%;
-	padding: 10px;
-	border: none;
-	background: rgba(0,151,167 ,1);
-	border-radius: 5px;
-	text-transform: uppercase;
-	font-size: 16px;
-	color: #fff;
-	letter-spacing: 1px;
-}
 
 .box{
 	width:100px;
@@ -87,29 +61,31 @@ button.learnmore{
 			  		<a href="{% url 'blog:edit' blog_post.slug %}" class="btn btn-primary">Update</a>
 				{% endif %}
 			</div>
-			<p id="likes">{{ likes }}</p>
+			<p id="likes">{{ likes }} People have liked</p>
 			{% if valid_user %}
+			<div id="display_button">
 				{% if not like_status %}
-					<button class="like" onclick="like();">
+					<button class="like" style="width:50px;" onclick="like();">
 					<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
 					</button>
 
-					<button class="dislike" onclick="dislike();" style="visibility: hidden">
+					<button class="dislike" onclick="dislike();" style="visibility: hidden; width:50px;">
 					<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
 					</button>
 					
 				
 
 				{% else %}
-					<button class="dislike" onclick="dislike();">
+					<button class="dislike" onclick="dislike();" style="width:50px;">
 					<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
 					</button>
 					
-					<button class="like" onclick="like();" style="visibility: hidden">
+					<button class="like" onclick="like();" style="visibility: hidden; width: 50px;">
 					<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
 					</button>
 
 				{% endif %}
+			</div>
 			{% endif %}
 
 			
@@ -125,26 +101,30 @@ button.learnmore{
 		
 
 	</div>
-	<input id="slug" type="hidden" value={{ slug }} readonly>
+	<input id="slug" type="hidden" value={{ slug }} readonly><br>
 
 	{% if valid_user %}
+	<div id="comment_box">
 		<form method="post">
 			{% csrf_token %}
-			<input type='text' placeholder="Comments" name="comment">
-			<input type="submit" value="Comment">
+			<textarea type='text' placeholder="Comments" rows=5 cols="76" name="comment"></textarea><br>
+			<input type="submit" value="Comment" class="btn btn-info">
 		</form>
+		</div>
 		<br><br>
 	{% endif %}
-		
+	<div id="comments_style">	
 	{% for comment in comments %}
 		 <div class="w3-row w3-padding-8">
 		
 	    <div class="w3-col 8 w3-padding-xsmall">
 	      <h4>{{ comment.user_id.username }}</h4>
-	      <p class="w3-text-grey">{{ comment.comment_text }}</p><br>
+		  <p class="w3-text-grey">{{ comment.comment_text }}</p>
+		  <p class="w3-text-grey">{{ comment.date_published }}</p>
 	    </div>
 		</div>
 	{% endfor %}
+	</div>
 
 	
 </div>

@@ -51,6 +51,14 @@ button.learnmore{
 	letter-spacing: 1px;
 }
 
+.box{
+	width:100px;
+	height:100px;
+}
+
+.blue{
+	background:#00f;
+}
 
 </style>
 
@@ -64,15 +72,17 @@ button.learnmore{
 		<div class="card m-auto">
 			<img class="card-img-top" src="{{blog_post.image.url}}">
 			<div class="card-body my-2">
-				<h2 class="card-title">{{blog_post.title}}</h2>
+				<h2 class="card-title">{{blog_post.title}} </h2>
+				{% for category in category_list %}
+					<h7 class="box blue">{{ category.category }}</h7>
+				{% endfor %}
+				<br>
+				<br>	
 				{% for i in content_img %}
 					<p class="card-text">{{i.content}}</p> <!-- safe means the render the html inside the body of the content-->
-					<img width="200" id="other_image" src='{{ i.img.image.url }}'>
+					<img class="card-img-top" id="other_image" src='{{ i.img.image.url }}'>
 				{% endfor %}
-			
-				{% for img in image_list %}
-					<img width="200" id="other_image" src='{{ img.image.url }}'>
-				{% endfor %}
+				<p class="card-text">{{last_text_body}}</p>
 				{% if blog_post.author == request.user %}
 			  		<a href="{% url 'blog:edit' blog_post.slug %}" class="btn btn-primary">Update</a>
 				{% endif %}
@@ -101,6 +111,9 @@ button.learnmore{
 
 				{% endif %}
 			{% endif %}
+
+			
+
 
 
 			<div class="card-footer text-muted">

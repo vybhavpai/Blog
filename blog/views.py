@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect, get_object_or_404
-from blog.models import BlogPost, Comment,Likes,Extra_Image
+from blog.models import BlogPost, Comment,Likes,Extra_Image, Categories
 from django.http import HttpResponse,JsonResponse
 from blog.forms import CreateBlogPostForm, UpdateBlogPostForm
 from account.models import Account
@@ -31,6 +31,13 @@ def create_blog_view(request):
 		author = Account.objects.filter(email=user.email).first()
 		obj.author = author
 		obj.save()
+		category_list = form.cleaned_data['category'].split(':')
+		for category in category_list:
+			cat_obj = Categories()
+			cat_obj.blog_id = BlogPost.objects.get(title=form.cleaned_data['title'])
+			cat_obj.category = category
+			cat_obj.save()
+
 		form = CreateBlogPostForm()
 		for f in request.FILES.getlist('other_image'):
 			img=Extra_Image()
@@ -76,15 +83,19 @@ def detail_blog_view(request,slug):
 		context['like_status']=True
 	except:
 		context['like_status']=False
+
 	context['blog_post'] = blog_post
-	print(blog_post.body)
+	# print(blog_post.body)
 	content=blog_post.body.split('<img>')
+	
+	category_list = Categories.objects.filter(blog_id = blog_post)
+	context['category_list'] = category_list
+
 	content_img=[]
 	for i in range(len(img)):
 		f=Content(content[i],img[i])
 		content_img.append(f)
-	f=Content(content[i])
-	content_img.append(f)
+	context['last_text_body'] = content[-1]
 
 	context['content_img']=content_img
 	comments=Comment.objects.filter(blog_id=blog_post)
